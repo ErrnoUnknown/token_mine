@@ -1,0 +1,43 @@
+/* Style input group container */
+.input-group-container {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    outline: none;
+    border: 0;
+  }
+  
+  /* Style input group item */
+  .input-group-item {
+    flex: 1;
+    margin-right: 10px;
+  }
+  
+  /* Style label span */
+  .input-group-text {
+    background-color: #5865F2;
+    padding: 10px;
+    border: 0;
+    outline: none;
+    color: #FFFFFF;
+    font-weight: bold;
+  }
+  
+  /* Style input field */
+  .form-control {
+    background-color: #383A40;
+    border: 0;
+    padding: 10px;
+  }
+
+  /* override on focus state */
+  .form-control:focus {
+    background-color: #383A40;
+    color: #FFFFFF;
+    outline: none;
+  }
+
+  /* override on placeholder text */
+  .form-control::placeholder {
+    color: #5B5D65;
+  }
