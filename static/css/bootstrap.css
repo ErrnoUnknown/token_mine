@@ -3948,6 +3948,7 @@ tbody.collapse.show {
   -ms-flex-pack: justify;
   justify-content: space-between;
   padding: 0.5rem 1rem;
+  background-color: #2B2D31;
 }
 
 .navbar > .container,
@@ -3974,6 +3975,7 @@ tbody.collapse.show {
   line-height: inherit;
   white-space: nowrap;
   font-weight: bold;
+  background-color: #2B2D31;
 }
 
 .navbar-brand:hover, .navbar-brand:focus {
