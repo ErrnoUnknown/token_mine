@@ -11,41 +11,45 @@
         <!-- Load Bootstrap -->
         <link href="static/css/bootstrap.css" rel="stylesheet">
 
-        <!-- Load gui style css -->
-        <link href="static/css/gui_style.css" rel="stylesheet">
+        <py-script>
+            # Import
+            import asyncio
+            
+            
+        </py-script>
     </head>
-    <br>
-    
-    <body style="background-color: #313338;">
-        <div class="container">
-            <div class="group-container">
-                <div class="input-group-item">
-                    <span class="input-group-text" id="input-user-handle">디스코드 유저 핸들</span>
+    <body style="background-color: #1E1F22;">
+        <nav class="navbar navbar-light bg-light">
+            <a class="navbar-brand" href="https://discord.com/channels/1124570328023175180/1143911353187315803">
+                <img src="static/image/discord_logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
+                <img src="static/image/token_bot_logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
+                토큰 봇
+            </a>
+        </nav>
+
+        <br>
+
+        <div class="container-fluid">
+            <div class="alert alert-danger" role="alert">
+                경고 메시지 테스트
+            </div>
+
+            <br>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="input-discord-handle">디스코드 핸들</span>
                 </div>
-                <div class="input-group-item">
-                    <input name="discord-user-handle" type="text" class="form-control" placeholder="여기에 입력" maxlength="32">
-                </div>
+                <input type="text" class="form-control" placeholder="이곳에 입력" aria-label="Username" aria-describedby="basic-addon1">
             </div>
         </div>
 
-        <br><br><br><br><br><br>
+        <br>
 
-        <div class="container">
-            <div class="group-container">
-                <div class="display-group-item">
-                    <span class="display-group-text" id="display-counter">0</span>
-                </div>
+        <div class="container-fluid">
+            <div class="alert alert-info" role="alert">
+                0 토큰
             </div>
-        </div>
-
-        <br><br><br><br><br><br>
-
-        <div class="container">
-            <div id="counter-div">11</div>
-            <button id="clicker-btn" class="clicker-button">Click</button>
-            <button id="claim-btn">Claim Reward</button>
-            <p id="reward-message"></p>
-            <div id="output-div">11</div>
         </div>
 
         <py-script>
@@ -53,10 +57,10 @@
 
             async def foo():
                 for i in range(100):
-                    Element("output-div").write(i)
+                    Element("input-counter").write(i)
                     await asyncio.sleep(1)
                     if i == 5:
-                        Element("output-div").write("compl")
+                        Element("input-counter").write("compl")
                         return
 
             pyscript.run_until_complete(foo())

@@ -1960,10 +1960,10 @@ pre code {
   padding: 0.375rem 0.75rem;
   font-size: 1rem;
   line-height: 1.5;
-  color: #495057;
-  background-color: #fff;
+  color: #FFFFFF;
+  background-color: #383A40;
   background-clip: padding-box;
-  border: 1px solid #ced4da;
+  border: 1px solid #383A40;
   border-radius: 0.25rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
@@ -1974,9 +1974,9 @@ pre code {
 }
 
 .form-control:focus {
-  color: #495057;
-  background-color: #fff;
-  border-color: #80bdff;
+  color: #FFFFFF;
+  background-color: #383A40;
+  border-color: #383A40;
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
@@ -2002,7 +2002,7 @@ pre code {
 }
 
 .form-control::placeholder {
-  color: #6c757d;
+  color: #62646D;
   opacity: 1;
 }
 
@@ -3567,12 +3567,13 @@ tbody.collapse.show {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #495057;
+  color: #FFFFFF;
   text-align: center;
   white-space: nowrap;
-  background-color: #e9ecef;
-  border: 1px solid #ced4da;
+  background-color: #5865F2;
+  border: 1px solid #5865F2;
   border-radius: 0.25rem;
+  font-weight: bold;
 }
 
 .input-group-text input[type="radio"],
@@ -3972,6 +3973,7 @@ tbody.collapse.show {
   font-size: 1.25rem;
   line-height: inherit;
   white-space: nowrap;
+  font-weight: bold;
 }
 
 .navbar-brand:hover, .navbar-brand:focus {
@@ -5019,9 +5021,10 @@ tbody.collapse.show {
 }
 
 .alert-info {
-  color: #0c5460;
-  background-color: #d1ecf1;
-  border-color: #bee5eb;
+  color: #FFFFFF;
+  background-color: #8402F4;
+  border-color: #8402F4;
+  font-weight: bold;
 }
 
 .alert-info hr {
@@ -5047,9 +5050,10 @@ tbody.collapse.show {
 }
 
 .alert-danger {
-  color: #721c24;
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
+  color: #FFFFFF;
+  background-color: #DD3446;
+  border-color: #DD3446;
+  font-weight: bold;
 }
 
 .alert-danger hr {
