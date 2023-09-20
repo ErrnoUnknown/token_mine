@@ -5070,6 +5070,10 @@ tbody.collapse.show {
   color: #491217;
 }
 
+.alert-danger:empty {
+  display: none;
+}
+
 .alert-light {
   color: #818182;
   background-color: #fefefe;

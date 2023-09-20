@@ -15,11 +15,34 @@
         <py-script>
             # Import
             import asyncio
-            import hashlib
+            from datetime import datetime
+            import math
+
+            # Define functions
+            def add_token():
+                global tokens, last_reward_time, last_click_time, click_intervals, MAX_CLICK_PER_SEC
+
+                click_intervals.append(math.floor((datetime.now() - last_click_time).total_seconds() * 10) / 10)
+                click_intervals = click_intervals[-100:]
+
+                last_click_time = datetime.now()
+
+                if len(click_intervals) == 100 and len(list(set(click_intervals))) == 1:
+                    Element("main-alert").write("매크로가 감지되었습니다.")
+
+                if (datetime.now() - last_reward_time).total_seconds() > (1 / MAX_CLICK_PER_SEC):
+                    last_reward_time = datetime.now()
+                    tokens += 1
+                    Element("token_rewards").write(f"{tokens} 토큰")
+
+            # Set constants
+            MAX_CLICK_PER_SEC = 5
 
             # Init variables
             tokens = 0
-            token_sha = 0
+            last_reward_time = datetime.now()
+            last_click_time = datetime.now()
+            click_intervals = []
         </py-script>
     </head>
     <body style="background-color: #313338;">
@@ -35,6 +58,7 @@
         <!-- Token mine -->
         <br>
         <div class="container-fluid">
+            <div class="alert alert-danger" role="alert" id="main-alert"></div>
             <div class="alert alert-info" role="alert" id="token_rewards">
                 0 토큰
             </div>
@@ -45,11 +69,8 @@
 
         <!-- Claim -->
         <br>
-        <div class="container-fluid">
-            <div class="alert alert-danger" role="alert">
-                경고 메시지 테스트
-            </div>
 
+        <div class="container-fluid">
             <br>
 
             <div class="input-group mb-3">
@@ -62,12 +83,18 @@
 
         <!-- Script -->
         <py-script>
-            def add_token():
-                global tokens, token_sha
-                
-                tokens += 1
-                token_sha = hashlib.sha256(tokens)
-                Element("token_rewards").write(f"{tokens} 토큰")
+            a = 1
         </py-script>
+
+        <script>
+            if (localStorage.getItem('myPageLoaded')) {
+              window.close();
+            } else {
+              localStorage.setItem('myPageLoaded', 'true');
+              window.addEventListener('beforeunload', function () {
+                localStorage.removeItem('myPageLoaded');
+              });
+            }
+          </script>
     </body>
 </html>
