@@ -20,20 +20,24 @@
 
             # Define functions
             def add_token():
-                global tokens, last_reward_time, last_click_time, click_intervals, MAX_CLICK_PER_SEC
+                global tokens, last_reward_time, last_click_time, click_intervals, MAX_CLICK_PER_SEC, is_macro
 
-                click_intervals.append(math.floor((datetime.now() - last_click_time).total_seconds() * 10) / 10)
-                click_intervals = click_intervals[-100:]
+                if is_macro:
+                    Element("main-alert").write("사용자 인증이 필요합니다.")
+                else:
+                    click_intervals.append(math.floor((datetime.now() - last_click_time).total_seconds() * 10) / 10)
+                    click_intervals = click_intervals[-100:]
 
-                last_click_time = datetime.now()
+                    last_click_time = datetime.now()
 
-                if len(click_intervals) == 100 and len(list(set(click_intervals))) == 1:
-                    Element("main-alert").write("매크로가 감지되었습니다.")
+                    if len(click_intervals) == 100 and len(list(set(click_intervals))) == 1:
+                        is_macro = True
+                        Element("main-alert").write("매크로가 감지되었습니다.")
 
-                if (datetime.now() - last_reward_time).total_seconds() > (1 / MAX_CLICK_PER_SEC):
-                    last_reward_time = datetime.now()
-                    tokens += 1
-                    Element("token_rewards").write(f"{tokens} 토큰")
+                    if (datetime.now() - last_reward_time).total_seconds() > (1 / MAX_CLICK_PER_SEC):
+                        last_reward_time = datetime.now()
+                        tokens += 1
+                        Element("token_rewards").write(f"{tokens} 토큰")
 
             # Set constants
             MAX_CLICK_PER_SEC = 5
@@ -43,6 +47,7 @@
             last_reward_time = datetime.now()
             last_click_time = datetime.now()
             click_intervals = []
+            is_macro = False
         </py-script>
     </head>
     <body style="background-color: #313338;">
