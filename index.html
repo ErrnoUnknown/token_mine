@@ -11,14 +11,19 @@
         <!-- Load Bootstrap -->
         <link href="static/css/bootstrap.css" rel="stylesheet">
 
+        <!-- Init Python -->
         <py-script>
             # Import
             import asyncio
-            
-            
+            import hashlib
+
+            # Init variables
+            tokens = 0
+            token_sha = 0
         </py-script>
     </head>
     <body style="background-color: #313338;">
+        <!-- Navbar -->
         <nav class="navbar navbar-dark">
             <a class="navbar-brand" href="https://discord.com/channels/1124570328023175180/1143911353187315803">
                 <img src="static/image/discord_logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
@@ -27,16 +32,19 @@
             </a>
         </nav>
 
+        <!-- Token mine -->
         <br>
-
         <div class="container-fluid">
-            <div class="alert alert-info" role="alert">
+            <div class="alert alert-info" role="alert" id="token_rewards">
                 0 토큰
+            </div>
+            <div class="d-flex justify-content-center">
+                <button py-click="add_token()" type="button" class="btn btn-primary btn-lg">토큰 얻기</button>
             </div>
         </div>
 
+        <!-- Claim -->
         <br>
-
         <div class="container-fluid">
             <div class="alert alert-danger" role="alert">
                 경고 메시지 테스트
@@ -52,18 +60,14 @@
             </div>
         </div>
 
+        <!-- Script -->
         <py-script>
-            import asyncio
-
-            async def foo():
-                for i in range(100):
-                    Element("input-counter").write(i)
-                    await asyncio.sleep(1)
-                    if i == 5:
-                        Element("input-counter").write("compl")
-                        return
-
-            pyscript.run_until_complete(foo())
+            def add_token():
+                global tokens, token_sha
+                
+                tokens += 1
+                token_sha = hashlib.sha256(tokens)
+                Element("token_rewards").write(f"{tokens} 토큰")
         </py-script>
     </body>
 </html>
