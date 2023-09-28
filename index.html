@@ -17,12 +17,13 @@
             import asyncio
             from datetime import datetime
             import math
+            import random
 
             # Define functions
             def add_token():
-                global tokens, last_reward_time, last_click_time, click_intervals, MAX_CLICK_PER_SEC, is_macro
+                global tokens, last_reward_time, last_click_time, click_intervals, MAX_CLICK_PER_SEC, is_verified
 
-                if is_macro:
+                if not is_verified:
                     Element("main-alert").write("사용자 인증이 필요합니다.")
                 else:
                     click_intervals.append(math.floor((datetime.now() - last_click_time).total_seconds() * 10) / 10)
@@ -31,7 +32,7 @@
                     last_click_time = datetime.now()
 
                     if len(click_intervals) == 100 and len(list(set(click_intervals))) == 1:
-                        is_macro = True
+                        is_verified = False
                         Element("main-alert").write("매크로가 감지되었습니다.")
 
                     if (datetime.now() - last_reward_time).total_seconds() > (1 / MAX_CLICK_PER_SEC):
@@ -39,15 +40,62 @@
                         tokens += 1
                         Element("token_rewards").write(f"{tokens} 토큰")
 
+            def generate_validation_prompt():
+                add_sym = ['+', '플러스', '더하기']
+                sub_sym = ['-', '마이너스', '빼기']
+                
+                numbers = []
+                is_positive = []
+                
+                for i in range(random.randint(1, 2)):
+                    numbers.append(random.randint(1, 5))
+                    is_positive.append(random.randint(0, 1))
+                
+                base = random.randint(1, 5)
+                
+                prompt = f'{base}'
+                result = base
+                
+                for n, p in zip(numbers, is_positive):
+                    if p:
+                        prompt += f' {random.choice(add_sym)} {n}'
+                        result += n
+                    else:
+                        prompt += f' {random.choice(sub_sym)} {n}'
+                        result -= n
+                
+                return {'prompt': prompt, 'result': result}
+
+            def check_validation():
+                global validation, is_verified
+
+                if is_verified:
+                    Element("user-varification-cmd").write("이미 사용자 인증에 성공했습니다.")
+                    return
+
+                is_verified = Element("user-answer").value == str(validation['result'])
+
+                if is_verified:
+                    Element("verification-alert").write("")
+                    Element("user-varification-cmd").write("사용자 인증에 성공했습니다.")
+                else:
+                    Element("verification-alert").write("사용자 인증 숫자가 일치하지 않습니다. 다시 시도해주세요.")
+
+
             # Set constants
-            MAX_CLICK_PER_SEC = 5
+            MAX_CLICK_PER_SEC = 3
 
             # Init variables
             tokens = 0
             last_reward_time = datetime.now()
             last_click_time = datetime.now()
             click_intervals = []
-            is_macro = False
+            is_verified = False
+
+            validation = generate_validation_prompt()
+
+            # Init
+            Element("user-varification-cmd").write(validation['prompt'])
         </py-script>
     </head>
     <body style="background-color: #313338;">
@@ -63,34 +111,60 @@
         <!-- Token mine -->
         <br>
         <div class="container-fluid">
+            <h1 style="color:#FFFFFF; font-weight: bolder;">토큰 적립</h1>
+            <br>
             <div class="alert alert-danger" role="alert" id="main-alert"></div>
             <div class="alert alert-info" role="alert" id="token_rewards">
                 0 토큰
             </div>
             <div class="d-flex justify-content-center">
-                <button py-click="add_token()" type="button" class="btn btn-primary btn-lg">토큰 얻기</button>
+                <button py-click="add_token()" type="button" class="btn btn-primary btn-lg">토큰 적립</button>
             </div>
         </div>
-
-        <!-- Claim -->
-        <br>
+        
+        <br><br><br>
 
         <div class="container-fluid">
-            <br>
+            <div class="row">
+                <!-- User verification -->
+                <div class="col-md-6">
+                    <h1 style="color:#FFFFFF; font-weight: bolder;">사용자 인증</h1>
 
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="input-discord-handle">디스코드 핸들</span>
+                    <br>
+
+                    <div class="alert alert-danger" role="alert" id="verification-alert"></div>
+
+                    <div class="alert alert-primary" role="alert" id="user-varification-cmd"> </div>
+                    
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="user-varification">사용자 인증 숫자</span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="이곳에 입력" aria-label="Username" aria-describedby="basic-addon1" id="user-answer">
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button py-click="check_validation()" type="button" class="btn btn-secondary btn-block">사용자 인증</button>
+                    </div>
                 </div>
-                <input type="text" class="form-control" placeholder="이곳에 입력" aria-label="Username" aria-describedby="basic-addon1">
+
+                <!-- Claim -->
+                <div class="col-md-6">
+                    <h1 style="color:#FFFFFF; font-weight: bolder;">토큰 얻기</h1>
+                    
+                    <br>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="input-discord-handle">디스코드 핸들</span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="이곳에 입력" aria-label="Username" aria-describedby="basic-addon1">
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Script -->
-        <py-script>
-            a = 1
-        </py-script>
-
         <script>
             if (localStorage.getItem('myPageLoaded')) {
               window.close();
