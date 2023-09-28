@@ -3,6 +3,7 @@
     <head>
         <!-- Config title -->
         <title>토큰 광산 테스트</title>
+        <link rel="icon" href="static/image/token_bot_logo.png" type="image/png" sizes="16x16 32x32 48x48">
 
         <!-- Load Pyscript -->
         <link rel="stylesheet" href="static/css/pyscript.css" />
@@ -21,7 +22,7 @@
 
             # Define functions
             def add_token():
-                global tokens, last_reward_time, last_click_time, click_intervals, MAX_CLICK_PER_SEC, is_verified
+                global tokens, last_reward_time, last_click_time, click_intervals, MAX_CLICK_PER_SEC, is_verified, validation
 
                 if not is_verified:
                     Element("main-alert").write("사용자 인증이 필요합니다.")
@@ -34,6 +35,9 @@
                     if len(click_intervals) == 100 and len(list(set(click_intervals))) == 1:
                         is_verified = False
                         Element("main-alert").write("매크로가 감지되었습니다.")
+
+                        validation = generate_validation_prompt()
+                        Element("user-varification-cmd").write(validation['prompt'])
 
                     if (datetime.now() - last_reward_time).total_seconds() > (1 / MAX_CLICK_PER_SEC):
                         last_reward_time = datetime.now()
@@ -78,10 +82,37 @@
                 if is_verified:
                     Element("verification-alert").write("")
                     Element("user-varification-cmd").write("사용자 인증에 성공했습니다.")
+                    Element("main-alert").write("")
+                    Element("claim-alert").write("")
                 else:
                     Element("verification-alert").write("사용자 인증 숫자가 일치하지 않습니다. 다시 시도해주세요.")
 
+            def claim_tokens():
+                global is_verified, tokens
 
+                if tokens >= 100:
+                    if is_verified:
+                        Element("claim-alert").write("")
+                        if Element("input-discord-handle").value == "":
+                            Element("claim-alert").write("유효한 핸들을 입력하세요.")
+                        else:
+                            Element("claim-alert").write("")
+                    else:
+                        Element("claim-alert").write("사용자 인증이 필요합니다.")
+                else:
+                    Element("claim-alert").write("토큰 얻기에는 최소 100 토큰이 필요합니다.")
+
+            async def validation_request_cycle():
+                global is_verified, validation
+
+                while True:
+                    await asyncio.sleep(random.randint(2, 4) * 60)
+
+                    if is_verified:
+                        is_verified = False
+                        validation = generate_validation_prompt()
+                        Element("user-varification-cmd").write(validation['prompt'])
+                    
             # Set constants
             MAX_CLICK_PER_SEC = 3
 
@@ -99,6 +130,15 @@
         </py-script>
     </head>
     <body style="background-color: #313338;">
+        <!-- Script -->
+        <script>
+            if (localStorage.getItem('myPageLoaded')) {
+              window.close();
+            } else {
+              localStorage.setItem('myPageLoaded', 'true');
+            }
+          </script>
+        
         <!-- Navbar -->
         <nav class="navbar navbar-dark">
             <a class="navbar-brand" href="https://discord.com/channels/1124570328023175180/1143911353187315803">
@@ -154,26 +194,24 @@
                     
                     <br>
 
+                    <div class="alert alert-danger" role="alert" id="claim-alert"></div>
+
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" id="input-discord-handle">디스코드 핸들</span>
+                            <span class="input-group-text">디스코드 핸들</span>
                         </div>
-                        <input type="text" class="form-control" placeholder="이곳에 입력" aria-label="Username" aria-describedby="basic-addon1">
+                        <input type="text" class="form-control" placeholder="이곳에 입력" aria-label="Username" aria-describedby="basic-addon1" id="input-discord-handle">
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button py-click="claim_tokens()" type="button" class="btn btn-secondary btn-block">토큰 얻기</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Script -->
-        <script>
-            if (localStorage.getItem('myPageLoaded')) {
-              window.close();
-            } else {
-              localStorage.setItem('myPageLoaded', 'true');
-              window.addEventListener('beforeunload', function () {
-                localStorage.removeItem('myPageLoaded');
-              });
-            }
-          </script>
+        <py-script>
+            pyscript.run_until_complete(validation_request_cycle())
+        </py-script>
     </body>
 </html>
