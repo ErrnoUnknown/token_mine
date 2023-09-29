@@ -12,6 +12,10 @@
         <!-- Load Bootstrap -->
         <link href="static/css/bootstrap.css" rel="stylesheet">
 
+        <script>
+            localStorage.setItem('tokenMinePageLoadedFlag', 'false');
+        </script>
+
         <!-- Init Python -->
         <py-script>
             # Import
@@ -25,7 +29,7 @@
 
             # Define functions
             def add_token():
-                global tokens, last_reward_time, last_click_time, click_intervals, MAX_CLICK_PER_SEC, is_verified, validation
+                global tokens, last_reward_time, last_click_time, click_intervals, MAX_CLICK_PER_SEC, is_verified, validation, is_same_loaded
 
                 if not is_verified:
                     Element("main-alert").write("사용자 인증이 필요합니다.")
@@ -34,6 +38,10 @@
                     click_intervals = click_intervals[-100:]
 
                     last_click_time = datetime.now()
+
+                    if is_same_loaded:
+                        Element("main-alert").write("다른 토큰 광산이 이 기기에서 이미 열려있습니다. 만약 열려있는 다른 토큰 광산이 없다면, 페이지를 재시작해주세요.")
+                        return
 
                     if len(click_intervals) == 100 and len(list(set(click_intervals))) == 1:
                         is_verified = False
@@ -152,6 +160,7 @@
             click_intervals = []
             is_verified = False
             complexity = 0
+            is_same_loaded = js.isSamePageLoaded()
 
             validation = generate_validation_prompt()
 
@@ -160,6 +169,18 @@
         </py-script>
 
         <script>
+            function isSamePageLoaded() {
+              if (localStorage.getItem('tokenMinePageLoadedFlag') === 'true') {
+                return true;
+              } else {
+                localStorage.setItem('tokenMinePageLoadedFlag', 'true');
+                const intervalId = setInterval(function () {
+                  localStorage.setItem('tokenMinePageLoadedFlag', 'true');
+                  }, 10);
+                return false;
+              }
+            }
+
             async function sendTokens(tokens) {
                 const inputHandle = document.getElementById("input-discord-handle").value;
                 const messageContent = `**----------**\n[테스트]\n@${inputHandle}\n${tokens} 토큰을 받았습니다.\n이 테스트는 디스코드 토큰 광산 연동 베타 테스트로, 실제 토큰 지급은 없습니다.\n버그 제보는 #버그-제보를 이용해주세요.`;
@@ -192,7 +213,7 @@
                     return false;
                 }
             }
-        </script>        
+        </script>
     </head>
     <body style="background-color: #313338;">
         <!-- Navbar -->
@@ -270,5 +291,12 @@
         <py-script>
             pyscript.run_until_complete(validation_request_cycle())
         </py-script>
+
+        <script>
+            window.addEventListener('beforeunload', function () {
+              clearInterval(intervalId);
+              localStorage.setItem('tokenMinePageLoadedFlag', 'false');
+            });
+        </script>
     </body>
 </html>
