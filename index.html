@@ -19,6 +19,9 @@
             from datetime import datetime
             import math
             import random
+            import urllib.request
+            import json
+            import js
 
             # Define functions
             def add_token():
@@ -45,6 +48,8 @@
                         Element("token_rewards").write(f"{tokens} 토큰")
 
             def generate_validation_prompt():
+                global complexity
+
                 add_sym = ['+', '플러스', '더하기']
                 sub_sym = ['-', '마이너스', '빼기']
                 
@@ -52,7 +57,7 @@
                 is_positive = []
                 
                 for i in range(random.randint(1, 2)):
-                    numbers.append(random.randint(1, 5))
+                    numbers.append(random.randint(1, 4 + (5 ** complexity)))
                     is_positive.append(random.randint(0, 1))
                 
                 base = random.randint(1, 5)
@@ -71,7 +76,7 @@
                 return {'prompt': prompt, 'result': result}
 
             def check_validation():
-                global validation, is_verified
+                global validation, is_verified, complexity
 
                 if is_verified:
                     Element("user-varification-cmd").write("이미 사용자 인증에 성공했습니다.")
@@ -84,23 +89,47 @@
                     Element("user-varification-cmd").write("사용자 인증에 성공했습니다.")
                     Element("main-alert").write("")
                     Element("claim-alert").write("")
+
+                    complexity -= 2
+                    if complexity < 0:
+                        complexity = 0
                 else:
                     Element("verification-alert").write("사용자 인증 숫자가 일치하지 않습니다. 다시 시도해주세요.")
+
+                    complexity += 1
+                    if complexity > 10:
+                        complexity = 10
+
+                    validation = generate_validation_prompt()
+                    Element("user-varification-cmd").write(validation['prompt'])    
 
             def claim_tokens():
                 global is_verified, tokens
 
-                if tokens >= 100:
+                if tokens >= 5:
                     if is_verified:
                         Element("claim-alert").write("")
                         if Element("input-discord-handle").value == "":
                             Element("claim-alert").write("유효한 핸들을 입력하세요.")
                         else:
-                            Element("claim-alert").write("")
+                            token_send = tokens + 0
+                            tokens = 0
+                            token_response = js.sendTokens(token_send)
+
+                            if token_response:
+                                Element("claim-alert").write("")
+                                ##########################################################################################################################
+                                Element("claim-info").write("#테스트 채널에서 테스트 메시지를 확인할 수 있습니다.")#적립된 토큰을 서버에서 성공적으로 얻었습니다. 토큰 지급은 최대 30초 가량 소요될 수 있습니다.
+                            else:
+                                tokens += token_send
+                                Element("claim-alert").write("토큰 얻기에 실패했습니다. 잠시 후 다시 시도해주세요.")
+                                Element("claim-info").write("")
+                            Element("token_rewards").write(f"{tokens} 토큰")
                     else:
                         Element("claim-alert").write("사용자 인증이 필요합니다.")
                 else:
-                    Element("claim-alert").write("토큰 얻기에는 최소 100 토큰이 필요합니다.")
+                    Element("claim-alert").write("토큰 얻기에는 최소 5 토큰이 필요합니다.")
+                    Element("claim-info").write("")
 
             async def validation_request_cycle():
                 global is_verified, validation
@@ -122,23 +151,50 @@
             last_click_time = datetime.now()
             click_intervals = []
             is_verified = False
+            complexity = 0
 
             validation = generate_validation_prompt()
 
             # Init
             Element("user-varification-cmd").write(validation['prompt'])
         </py-script>
+
+        <script>
+            async function sendTokens(tokens) {
+                const inputHandle = document.getElementById("input-discord-handle").value;
+                const messageContent = `\n\n\n\n\n[테스트]\n@${inputHandle}\n${tokens} 토큰을 받았습니다.\n이 테스트는 디스코드 토큰 광산 연동 베타 테스트로, 실제 토큰 지급은 없습니다.\n버그 제보는 #버그-제보를 이용하주세요.`;
+        
+                const data = {
+                    content: messageContent,
+                };
+        
+                const dataJson = JSON.stringify(data);
+        
+                const webhookUrl = "https://discord.com/api/webhooks/1156869091286593576/m5w04lHHZBIjP4Y9QZ8iolkDX6OLpha9NRU2CJxx3LSdXAjsdnslewjc4xVyd4KDlMQk";
+        
+                try {
+                    const response = await fetch(webhookUrl, {
+                        method: "POST",
+                        body: dataJson,
+                        headers: {
+                            "Content-Type": "application/json",
+                            "User-Agent": "Mozilla/5.0",
+                        },
+                    });
+        
+                    if (response.status === 204) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (error) {
+                    console.error(error);
+                    return false;
+                }
+            }
+        </script>        
     </head>
     <body style="background-color: #313338;">
-        <!-- Script -->
-        <script>
-            if (localStorage.getItem('myPageLoaded')) {
-              window.close();
-            } else {
-              localStorage.setItem('myPageLoaded', 'true');
-            }
-          </script>
-        
         <!-- Navbar -->
         <nav class="navbar navbar-dark">
             <a class="navbar-brand" href="https://discord.com/channels/1124570328023175180/1143911353187315803">
@@ -195,6 +251,7 @@
                     <br>
 
                     <div class="alert alert-danger" role="alert" id="claim-alert"></div>
+                    <div class="alert alert-primary" role="alert" id="claim-info"></div>
 
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
