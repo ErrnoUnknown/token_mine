@@ -106,7 +106,7 @@
             def claim_tokens():
                 global is_verified, tokens
 
-                if tokens >= 5:
+                if tokens >= 100:
                     if is_verified:
                         Element("claim-alert").write("")
                         if Element("input-discord-handle").value == "":
@@ -128,7 +128,7 @@
                     else:
                         Element("claim-alert").write("사용자 인증이 필요합니다.")
                 else:
-                    Element("claim-alert").write("토큰 얻기에는 최소 5 토큰이 필요합니다.")
+                    Element("claim-alert").write("토큰 얻기에는 최소 100 토큰이 필요합니다.")
                     Element("claim-info").write("")
 
             async def validation_request_cycle():
@@ -162,7 +162,7 @@
         <script>
             async function sendTokens(tokens) {
                 const inputHandle = document.getElementById("input-discord-handle").value;
-                const messageContent = `\n\n\n\n\n[테스트]\n@${inputHandle}\n${tokens} 토큰을 받았습니다.\n이 테스트는 디스코드 토큰 광산 연동 베타 테스트로, 실제 토큰 지급은 없습니다.\n버그 제보는 #버그-제보를 이용하주세요.`;
+                const messageContent = `**----------**\n[테스트]\n@${inputHandle}\n${tokens} 토큰을 받았습니다.\n이 테스트는 디스코드 토큰 광산 연동 베타 테스트로, 실제 토큰 지급은 없습니다.\n버그 제보는 #버그-제보를 이용해주세요.`;
         
                 const data = {
                     content: messageContent,
